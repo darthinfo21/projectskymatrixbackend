@@ -1,0 +1,13 @@
+package com.coforge.project.seatselection;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SeatselectionServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SeatselectionServiceApplication.class, args);
+	}
+
+}

@@ -1,0 +1,34 @@
+package com.coforge.project.seatselection.controller;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.coforge.project.seatselection.model.SeatSelection;
+import com.coforge.project.seatselection.service.SeatSelectionService;
+
+import java.util.List;
+
+@CrossOrigin(origins = "http://localhost:4200") // Replace with your frontend URL
+@RestController
+@RequestMapping("/api/seats")
+public class SeatSelectionController {
+
+    @Autowired
+    private SeatSelectionService seatSelectionService;
+
+    @PostMapping("/select")
+    public SeatSelection selectSeat(@RequestBody SeatSelection seatSelection) {
+        return seatSelectionService.selectSeat(seatSelection);
+    }
+
+    @GetMapping("/flight/{flightId}")
+    public List<SeatSelection> getSeatsByFlightId(@PathVariable Long flightId) {
+        return seatSelectionService.getSeatsByFlightId(flightId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<SeatSelection> getSeatsByUserId(@PathVariable Long userId) {
+        return seatSelectionService.getSeatsByUserId(userId);
+    }
+}

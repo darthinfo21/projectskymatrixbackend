@@ -1,0 +1,5 @@
+package com.coforge.project.seatselection.dto;
+
+public class UserDTO {
+
+}

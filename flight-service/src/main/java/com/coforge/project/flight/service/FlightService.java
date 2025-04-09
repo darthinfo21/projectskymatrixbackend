@@ -1,0 +1,125 @@
+//package com.coforge.project.flight.service;
+//
+//import java.time.LocalDateTime;
+//import java.util.List;
+//
+//import org.springframework.stereotype.Service;
+//
+//import com.coforge.project.flight.feign.UserFeignClient;
+//import com.coforge.project.flight.model.Flight;
+//import com.coforge.project.flight.repository.FlightRepository;
+//
+//@Service
+//public class FlightService {
+//    private final FlightRepository flightRepository;
+//    private final UserFeignClient userFeignClient;
+//
+//    public FlightService(FlightRepository flightRepository, UserFeignClient userFeignClient) {
+//        this.flightRepository = flightRepository;
+//        this.userFeignClient = userFeignClient;
+//    }
+//
+//    public Object getUserDetails(Long userId) {
+//        return userFeignClient.getUserById(userId);
+//    }
+//
+//    public Flight addFlight(Flight flight) {
+//        return flightRepository.save(flight);
+//    }
+//
+//    public List<Flight> getAllFlights() {
+//        return flightRepository.findAll();
+//    }
+//
+//    public List<Flight> searchFlights(String source, String destination, LocalDateTime departureTime, LocalDateTime arrivalTime) {
+//        return flightRepository.findBySourceAndDestinationAndDepartureTimeAndArrivalTime(
+//            source, destination, departureTime, arrivalTime
+//        );
+//    }
+//
+//    public void deleteFlight(Long id) {
+//        flightRepository.deleteById(id);
+//    }
+//    
+//    public Flight updateSeats(Flight flight) {
+//        Flight existingFlight = flightRepository.findById(flight.getId()).orElseThrow(() -> new RuntimeException("Flight not found!"));
+//        existingFlight.setAvailableSeats(flight.getAvailableSeats());
+//        return flightRepository.save(existingFlight);
+//    }
+//
+//    public Flight getFlightById(Long id) {
+//        return flightRepository.findById(id).orElseThrow(() -> new RuntimeException("Flight not found!"));
+//    }
+//    
+//    public Flight updateFlight(Flight flight) {
+//        Flight existingFlight = flightRepository.findById(flight.getId()).orElseThrow(() -> new RuntimeException("Flight not found!"));
+//        existingFlight.setFlightNumber(flight.getFlightNumber());
+//        existingFlight.setDestination(flight.getDestination());
+//        existingFlight.setDepartureTime(flight.getDepartureTime());
+//        existingFlight.setArrivalTime(flight.getArrivalTime());
+//        return flightRepository.save(existingFlight);
+//    }
+//}
+package com.coforge.project.flight.service;
+ 
+import java.util.List;
+ 
+import org.springframework.stereotype.Service;
+ 
+import com.coforge.project.flight.feign.UserFeignClient;
+import com.coforge.project.flight.model.Flight;
+import com.coforge.project.flight.repository.FlightRepository;
+ 
+@Service
+public class FlightService {
+    private final FlightRepository flightRepository;
+    private final UserFeignClient userFeignClient;
+ 
+    public FlightService(FlightRepository flightRepository, UserFeignClient userFeignClient) {
+        this.flightRepository = flightRepository;
+        this.userFeignClient = userFeignClient;
+    }
+ 
+    public Object getUserDetails(Long userId) {
+        return userFeignClient.getUserById(userId);
+    }
+ 
+    public Flight addFlight(Flight flight) {
+        return flightRepository.save(flight);
+    }
+ 
+    public List<Flight> getAllFlights() {
+        return flightRepository.findAll();
+    }
+ 
+    public List<Flight> searchFlights(String source, String destination) {
+    	return flightRepository.findBySourceIgnoreCaseAndDestinationIgnoreCase(source, destination);    
+    	}
+    
+    public List<String> getCityNames(String query) {
+    	return flightRepository.findDistinctCityNames(query);
+    	}
+    
+    public void deleteFlight(Long id) {
+        flightRepository.deleteById(id);
+    }
+ 
+    public Flight updateSeats(Flight flight) {
+        Flight existingFlight = flightRepository.findById(flight.getId()).orElseThrow(() -> new RuntimeException("Flight not found!"));
+        existingFlight.setAvailableSeats(flight.getAvailableSeats());
+        return flightRepository.save(existingFlight);
+    }
+ 
+    public Flight getFlightById(Long id) {
+        return flightRepository.findById(id).orElseThrow(() -> new RuntimeException("Flight not found!"));
+    }
+ 
+    public Flight updateFlight(Flight flight) {
+        Flight existingFlight = flightRepository.findById(flight.getId()).orElseThrow(() -> new RuntimeException("Flight not found!"));
+        existingFlight.setFlightNumber(flight.getFlightNumber());
+        existingFlight.setDestination(flight.getDestination());
+        existingFlight.setDepartureTime(flight.getDepartureTime());
+        existingFlight.setArrivalTime(flight.getArrivalTime());
+        return flightRepository.save(existingFlight);
+    }
+}

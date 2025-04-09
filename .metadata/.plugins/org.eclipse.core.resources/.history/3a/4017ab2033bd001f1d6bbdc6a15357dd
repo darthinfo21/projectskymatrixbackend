@@ -1,0 +1,105 @@
+package com.coforge.project.booking.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.coforge.project.booking.dto.BookingDTO;
+import com.coforge.project.booking.dto.BookingResponse;
+import com.coforge.project.booking.dto.FlightDTO;
+import com.coforge.project.booking.dto.UserDTO;
+import com.coforge.project.booking.feign.FlightFeignClient;
+import com.coforge.project.booking.feign.UserFeignClient;
+import com.coforge.project.booking.model.Booking;
+import com.coforge.project.booking.model.BookingDetailsOfUsers;
+import com.coforge.project.booking.repository.BookingDetailsOfUsersRepository;
+
+
+@Service
+public class BookingService {
+    private final BookingRepository bookingRepository;
+    private final BookingDetailsOfUsersRepository bookingDetailsOfUsersRepository;
+    private final UserFeignClient userFeignClient;
+    private final FlightFeignClient flightFeignClient;
+
+    public BookingService(BookingRepository bookingRepository, BookingDetailsOfUsersRepository bookingDetailsOfUsersRepository, UserFeignClient userFeignClient, FlightFeignClient flightFeignClient) {
+        this.bookingRepository = bookingRepository;
+        this.bookingDetailsOfUsersRepository = bookingDetailsOfUsersRepository;
+        this.userFeignClient = userFeignClient;
+        this.flightFeignClient = flightFeignClient;
+    }
+
+    @Transactional
+    public BookingResponse bookFlight(BookingDTO bookingDTO) {
+        // Ensure at least 1 passenger is booked
+        if (bookingDTO.getNumberOfPassengers() < 1) {
+            throw new RuntimeException("At least one passenger is required to book a flight.");
+        }
+
+        // Fetch user and flight details
+        UserDTO user = userFeignClient.getUserById(bookingDTO.getUserId());
+        FlightDTO flight = flightFeignClient.getFlightById(bookingDTO.getFlightId());
+
+        // Calculate total fare
+        double totalFare = flight.getFare() * bookingDTO.getNumberOfPassengers();
+
+        // Check if user has enough balance
+        if (user.getWalletBalance() < totalFare) {
+            throw new RuntimeException("Insufficient wallet balance.");
+        }
+
+        // Deduct fare from user's wallet
+        user.setWalletBalance(user.getWalletBalance() - totalFare);
+        userFeignClient.updateUser(user);
+
+        // Update available seats in flight
+        flight.setAvailableSeats(flight.getAvailableSeats() - bookingDTO.getNumberOfPassengers());
+        flightFeignClient.updateFlight(flight);
+
+        // Save booking
+        Booking booking = new Booking();
+        booking.setUserId(bookingDTO.getUserId());
+        booking.setFlightId(bookingDTO.getFlightId());
+        booking.setNumberOfPassengers(bookingDTO.getNumberOfPassengers());
+        booking.setBookingTime(bookingDTO.getBookingTime());
+        bookingRepository.save(booking);
+
+        // Save booking details of user
+        BookingDetailsOfUsers bookingDetails = new BookingDetailsOfUsers();
+        bookingDetails.setUserId(user.getId());
+        bookingDetails.setUsername(user.getUsername());
+        bookingDetails.setFlightId(flight.getId());
+        bookingDetails.setFare(totalFare);
+        bookingDetails.setBookingTime(bookingDTO.getBookingTime());
+        bookingDetailsOfUsersRepository.save(bookingDetails);
+
+        // Create response object
+        BookingResponse response = new BookingResponse();
+        response.setUsername(user.getUsername());
+        response.setFare(totalFare);
+        response.setMessage("Flight booked successfully!");
+
+        return response;
+    }
+
+    @Transactional
+    public void cancelBooking(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found!"));
+        UserDTO user = userFeignClient.getUserById(booking.getUserId());
+        FlightDTO flight = flightFeignClient.getFlightById(booking.getFlightId());
+
+        // Calculate refund amount with 5% cancellation charge
+        double totalFare = flight.getFare() * booking.getNumberOfPassengers();
+        double refundAmount = totalFare * 0.95;
+
+        // Refund to user's wallet
+        user.setWalletBalance(user.getWalletBalance() + refundAmount);
+        userFeignClient.updateUser(user);
+
+        // Update available seats in flight
+        flight.setAvailableSeats(flight.getAvailableSeats() + booking.getNumberOfPassengers());
+        flightFeignClient.updateFlight(flight);
+
+        // Delete booking
+        bookingRepository.delete(booking);
+    }
+}

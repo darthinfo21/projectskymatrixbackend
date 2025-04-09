@@ -1,0 +1,174 @@
+//package com.coforge.project.flight.controller;
+//
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.*;
+//
+//import com.coforge.project.flight.model.Flight;
+//import com.coforge.project.flight.service.FlightService;
+//
+//import java.time.LocalDateTime;
+//import java.util.List;
+//
+//
+//@CrossOrigin(origins = "http://localhost:4200") // Replace with your frontend URL
+//@RestController
+//@RequestMapping("/api/flights")
+//public class FlightController {
+//    private final FlightService flightService;
+//
+//    public FlightController(FlightService flightService) {
+//        this.flightService = flightService;
+//    }
+//    
+//    @GetMapping("/")
+//    public String welcome() {
+//        return "h";
+//    }
+//
+//    @PostMapping("/add")
+//    public ResponseEntity<String> addFlight(@RequestBody Flight flight) {
+//        flightService.addFlight(flight);
+//        return ResponseEntity.ok("Flight added successfully!");
+//    }
+//
+//    @GetMapping("/all")
+//    public List<Flight> getAllFlights() {
+//        return flightService.getAllFlights();
+//    }
+//
+//    @GetMapping("/search")
+//    public List<Flight> searchFlights(@RequestParam String source, 
+//                                      @RequestParam String destination, 
+//                                      @RequestParam String departureTime, 
+//                                      @RequestParam String arrivalTime) {
+//        LocalDateTime departureDateTime = LocalDateTime.parse(departureTime);
+//        LocalDateTime arrivalDateTime = LocalDateTime.parse(arrivalTime);
+//        return flightService.searchFlights(source, destination, departureDateTime, arrivalDateTime);
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<String> deleteFlight(@PathVariable Long id) {
+//        flightService.deleteFlight(id);
+//        return ResponseEntity.ok("Flight deleted successfully!");
+//    }
+//    
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Flight> getFlightById(@PathVariable Long id) {
+//        Flight flight = flightService.getFlightById(id);
+//        return ResponseEntity.ok(flight);
+//    }
+//    
+//    @PutMapping("/update")
+//    public ResponseEntity<Flight> updateFlight(@RequestBody Flight flight) {
+//        Flight updatedFlight = flightService.updateFlight(flight);
+//        return ResponseEntity.ok(updatedFlight);
+//    }
+//}
+
+package com.coforge.project.flight.controller;
+ 
+import org.springframework.http.ResponseEntity;
+
+import org.springframework.web.bind.annotation.*;
+ 
+import com.coforge.project.flight.model.Flight;
+
+import com.coforge.project.flight.service.FlightService;
+ 
+import java.util.List;
+ 
+
+@CrossOrigin(origins = "http://localhost:4200") // Replace with your frontend URL
+
+@RestController
+
+@RequestMapping("/api/flights")
+
+public class FlightController {
+
+    private final FlightService flightService;
+ 
+    public FlightController(FlightService flightService) {
+
+        this.flightService = flightService;
+
+    }
+ 
+    @GetMapping("/")
+
+    public String welcome() {
+
+        return "h";
+
+    }
+ 
+    @PostMapping("/add")
+
+    public ResponseEntity<String> addFlight(@RequestBody Flight flight) {
+
+        flightService.addFlight(flight);
+
+        return ResponseEntity.ok("Flight added successfully!");
+
+    }
+ 
+    @GetMapping("/all")
+
+    public List<Flight> getAllFlights() {
+
+        return flightService.getAllFlights();
+
+    }
+ 
+    @GetMapping("/search")
+    
+    public List<Flight> searchFlights(@RequestParam String source, @RequestParam String destination) {
+ 
+        return flightService.searchFlights(source, destination);
+ 
+    }
+    
+    @GetMapping("/cityNames") public List<String> getCityNames(@RequestParam("query") String query)
+    { // Explicitly name the parameter
+    	return flightService.getCityNames(query);
+    	
+    }
+    @DeleteMapping("/{id}")
+
+    public ResponseEntity<String> deleteFlight(@PathVariable Long id) {
+
+        flightService.deleteFlight(id);
+
+        return ResponseEntity.ok("Flight deleted successfully!");
+
+    }
+ 
+    @GetMapping("/{id}")
+
+    public ResponseEntity<Flight> getFlightById(@PathVariable Long id) {
+
+        Flight flight = flightService.getFlightById(id);
+
+        return ResponseEntity.ok(flight);
+
+    }
+ 
+    @PutMapping("/update")
+
+    public ResponseEntity<Flight> updateFlight(@RequestBody Flight flight) {
+
+        Flight updatedFlight = flightService.updateFlight(flight);
+
+        return ResponseEntity.ok(updatedFlight);
+
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Object> getUserDetails(@PathVariable Long userId) {
+        Object userDetails = flightService.getUserDetails(userId);
+        return ResponseEntity.ok(userDetails);
+    }
+
+}
+
+ 

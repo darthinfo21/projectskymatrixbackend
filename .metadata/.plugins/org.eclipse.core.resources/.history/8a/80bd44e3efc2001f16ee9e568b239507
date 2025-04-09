@@ -1,0 +1,5 @@
+package com.coforge.project.seatselection.model;
+
+public class SeatSelection {
+
+}

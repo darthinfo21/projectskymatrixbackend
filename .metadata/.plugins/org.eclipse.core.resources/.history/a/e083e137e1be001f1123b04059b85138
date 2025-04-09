@@ -1,0 +1,41 @@
+package com.coforge.project.booking.controller;
+
+import com.coforge.project.booking.dto.BookingDTO;
+import com.coforge.project.booking.service.BookingService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/bookings")
+public class BookingController {
+    private final BookingService bookingService;
+
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+    
+    @GetMapping("/")
+    public String welcome() {
+    	return "4";
+    }
+
+    @PostMapping("/book")
+    public ResponseEntity<String> bookFlight(@RequestBody BookingDTO bookingDTO) {
+        try {
+            bookingService.bookFlight(bookingDTO);
+            return ResponseEntity.ok("Flight booked successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/cancel/{id}")
+    public ResponseEntity<String> cancelBooking(@PathVariable Long id) {
+        try {
+            bookingService.cancelBooking(id);
+            return ResponseEntity.ok("Booking cancelled successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+}

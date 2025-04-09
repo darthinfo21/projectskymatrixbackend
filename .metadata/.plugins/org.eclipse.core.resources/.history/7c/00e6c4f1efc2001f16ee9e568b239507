@@ -1,0 +1,5 @@
+package com.coforge.project.seatselection.repository;
+
+public interface SeatSelectionRepository {
+
+}

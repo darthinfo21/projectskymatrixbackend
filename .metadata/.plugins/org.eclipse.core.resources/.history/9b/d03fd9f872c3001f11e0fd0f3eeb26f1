@@ -1,0 +1,17 @@
+package com.coforge.project.seatselection.repository;
+
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.coforge.project.seatselection.model.SeatSelection;
+
+import java.util.List;
+
+@Repository
+public interface SeatSelectionRepository extends JpaRepository<SeatSelection, Long> {
+    List<SeatSelection> findByFlightId(Long flightId);
+    List<SeatSelection> findByUserId(Long userId);
+    List<Seat> findByBookingId(Long bookingId);
+
+}

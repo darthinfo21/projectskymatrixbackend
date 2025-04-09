@@ -1,0 +1,9 @@
+package com.coforge.project.booking.repository;
+
+import com.coforge.project.booking.model.BookingDetailsOfUsers;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface BookingDetailsOfUsersRepository extends JpaRepository<BookingDetailsOfUsers, Long> {
+}

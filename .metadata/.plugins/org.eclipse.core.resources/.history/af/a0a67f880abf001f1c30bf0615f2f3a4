@@ -1,0 +1,59 @@
+package com.coforge.project.flight.service;
+
+import com.coforge.project.flight.model.Flight;
+import com.coforge.project.flight.repository.FlightRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class FlightService {
+
+    private final FlightRepository flightRepository;
+
+    public FlightService(FlightRepository flightRepository) {
+        this.flightRepository = flightRepository;
+    }
+
+    public Flight addFlight(Flight flight) {
+        return flightRepository.save(flight);
+    }
+
+    public List<Flight> getAllFlights() {
+        return flightRepository.findAll();
+    }
+
+    public List<Flight> searchFlights(String source, String destination) {
+        return flightRepository.findBySourceAndDestination(source, destination);
+    }
+
+    public void deleteFlight(Long id) {
+        flightRepository.deleteById(id);
+    }
+
+    public Flight getFlightById(Long id) {
+        return flightRepository.findById(id).orElseThrow(() -> new RuntimeException("Flight not found!"));
+    }
+
+    public Flight updateFlight(Flight flight) {
+        Flight existingFlight = flightRepository.findById(flight.getId()).orElseThrow(() -> new RuntimeException("Flight not found!"));
+        existingFlight.setFlightNumber(flight.getFlightNumber());
+        existingFlight.setAirline(flight.getAirline());
+        existingFlight.setSource(flight.getSource());
+        existingFlight.setDestination(flight.getDestination());
+        existingFlight.setDepartureTime(flight.getDepartureTime());
+        existingFlight.setArrivalTime(flight.getArrivalTime());
+        existingFlight.setFare(flight.getFare());
+        existingFlight.setTotalSeats(flight.getTotalSeats());
+        existingFlight.setAvailableSeats(flight.getAvailableSeats());
+        return flightRepository.save(existingFlight);
+    }
+
+    public double calculateFare(Long flightId, int seats) {
+        Flight flight = getFlightById(flightId);
+        double baseFare = flight.getFare();
+        // Example fare calculation logic: increase fare by 10% for each additional seat
+        double totalFare = baseFare * seats * (1 + 0.1 * (seats - 1));
+        return totalFare;
+    }
+}
